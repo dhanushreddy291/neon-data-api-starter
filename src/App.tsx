@@ -15,7 +15,7 @@ import Auth from "./pages/Auth"
 function Layout() {
   return (
     <SignedIn>
-      <div className="flex h-screen bg-background font-sans text-foreground">
+      <div className="flex h-screen bg-gradient-to-br from-slate-50 to-violet-50/30 font-sans text-foreground dark:from-slate-950 dark:to-violet-950/20">
         <Sidebar />
         <main className="flex-1 overflow-hidden">
           <Outlet />

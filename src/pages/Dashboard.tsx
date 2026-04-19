@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { PlusIcon, SearchIcon } from "lucide-react"
+import { PlusIcon, SearchIcon, FileTextIcon } from "lucide-react"
 import type { Note } from "@/db/schema"
 import type { Database } from "@/types"
 
@@ -34,30 +34,46 @@ function NoteCard({ note, onClick }: { note: Note; onClick: () => void }) {
 
   const preview = note.content.slice(0, 100)
   const title = note.content.split("\n")[0].slice(0, 50) || "Untitled"
+  const date = new Date(note.createdAt)
 
   return (
     <Card
-      className="cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md"
+      className="group cursor-pointer overflow-hidden border-border/50 bg-white/50 backdrop-blur-sm transition-all duration-200 hover:-translate-y-1 hover:border-violet-200 hover:shadow-lg hover:shadow-violet-500/10 dark:bg-slate-900/50"
       onClick={onClick}
     >
       <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <CardTitle className="line-clamp-1 text-base font-medium">
-            {title}
-          </CardTitle>
-          <Badge variant="secondary">You</Badge>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-100 to-purple-100 text-violet-600 dark:from-violet-900/50 dark:to-purple-900/50 dark:text-violet-400">
+              <FileTextIcon className="h-4 w-4" />
+            </div>
+            <CardTitle className="line-clamp-1 text-base font-medium">
+              {title}
+            </CardTitle>
+          </div>
+          <Badge variant="secondary" className="shrink-0 text-xs">
+            You
+          </Badge>
         </div>
         <CardDescription className="line-clamp-2 text-xs">
           {preview}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
-        <p className="text-xs text-muted-foreground">
-          {new Date(note.createdAt).toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "long",
-          })}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            {date.toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+            })}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {date.toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+        </div>
       </CardContent>
     </Card>
   )
@@ -113,19 +129,42 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-14 items-center justify-between border-b border-border px-6">
-        <h2 className="text-lg font-semibold">My Notes</h2>
-        <div className="flex items-center gap-2">
+      <header className="flex h-14 items-center justify-between gap-4 border-b border-border/50 bg-white/30 px-6 pl-14 backdrop-blur-sm md:pl-4 dark:bg-slate-900/30">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/20">
+            <svg
+              className="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-lg font-semibold tracking-tight whitespace-nowrap">
+            My Notes
+          </h2>
+        </div>
+        <div className="flex items-center gap-3">
           <div className="relative">
             <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search notes..."
+              placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-64 pl-9"
+              className="w-40 rounded-xl border-border/50 bg-white/50 pl-9 backdrop-blur-sm focus:bg-white sm:w-56 dark:bg-slate-800/50 dark:focus:bg-slate-800"
             />
           </div>
-          <Button onClick={handleCreateNote} size="sm">
+          <Button
+            onClick={handleCreateNote}
+            size="sm"
+            className="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-700 hover:to-purple-700"
+          >
             <PlusIcon className="mr-1 h-4 w-4" />
             New Note
           </Button>
@@ -139,18 +178,23 @@ export default function Dashboard() {
           </div>
         ) : filteredNotes.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center text-center">
-            <div className="mb-4 text-5xl">📝</div>
-            <h3 className="mb-2 text-lg font-medium">No notes yet</h3>
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg dark:from-violet-900/50 dark:to-purple-900/50">
+              <FileTextIcon className="h-8 w-8 text-violet-600 dark:text-violet-400" />
+            </div>
+            <h3 className="mb-2 text-lg font-semibold">No notes yet</h3>
             <p className="mb-4 text-sm text-muted-foreground">
               Create your first note to get started
             </p>
-            <Button onClick={handleCreateNote}>
+            <Button
+              onClick={handleCreateNote}
+              className="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-700 hover:to-purple-700"
+            >
               <PlusIcon className="mr-1 h-4 w-4" />
               Create your first note
             </Button>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredNotes.map((note) => (
               <NoteCard
                 key={note.id}

@@ -7,18 +7,14 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  ArrowLeftIcon,
-  ShareIcon,
-  TrashIcon,
-  MoreHorizontalIcon,
-  GlobeIcon,
-} from "lucide-react"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { ArrowLeftIcon, ShareIcon, TrashIcon, GlobeIcon } from "lucide-react"
 import { UserButton } from "@neondatabase/neon-js/auth/react"
 
 function mapNote(row: Database["public"]["Tables"]["notes"]["Row"]): Note {
@@ -40,6 +36,7 @@ export default function NoteEditor() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const { data: session } = neon.auth.useSession()
 
@@ -110,23 +107,36 @@ export default function NoteEditor() {
   if (!note) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Note not found, or you don't have access to it.</p>
+        <p className="text-muted-foreground">
+          Note not found, or you don't have access to it.
+        </p>
       </div>
     )
   }
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-14 items-center justify-between border-b border-border px-6">
+      <header className="flex h-14 items-center justify-between border-b border-border/50 bg-white/30 px-6 backdrop-blur-sm dark:bg-slate-900/30">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-xl"
+            onClick={() => navigate("/")}
+          >
             <ArrowLeftIcon className="h-4 w-4" />
           </Button>
           <div className="flex items-center gap-2">
             {isSaving ? (
-              <Badge variant="secondary">Saving...</Badge>
+              <Badge variant="secondary" className="rounded-lg text-xs">
+                <span className="mr-1 inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500" />
+                Saving...
+              </Badge>
             ) : lastSaved ? (
-              <Badge variant="secondary">Saved</Badge>
+              <Badge variant="secondary" className="rounded-lg text-xs">
+                <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-500" />
+                Saved
+              </Badge>
             ) : null}
           </div>
         </div>
@@ -137,6 +147,7 @@ export default function NoteEditor() {
               variant={note.isShared ? "default" : "outline"}
               size="sm"
               onClick={handleToggleShare}
+              className="rounded-xl"
             >
               {note.isShared ? (
                 <>
@@ -152,24 +163,26 @@ export default function NoteEditor() {
             </Button>
           )}
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontalIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={handleDelete}
-              >
-                <TrashIcon className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {session?.user?.id === note.ownerId && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-xl text-muted-foreground hover:text-destructive"
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              <TrashIcon className="h-4 w-4" />
+            </Button>
+          )}
 
-          <UserButton />
+          <UserButton
+            size="icon"
+            className="rounded-xl ring-2 ring-violet-500/20 hover:ring-violet-500/40"
+            classNames={{
+              trigger: {
+                base: "!h-10 !w-10",
+              },
+            }}
+          />
         </div>
       </header>
 
@@ -177,10 +190,41 @@ export default function NoteEditor() {
         <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Start writing..."
-          className="min-h-full resize-none border-0 bg-transparent text-lg leading-relaxed focus-visible:ring-0"
+          placeholder="Start writing your note..."
+          className="min-h-full resize-none border-0 bg-transparent text-lg leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0"
         />
       </div>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="max-w-100">
+          <DialogHeader>
+            <DialogTitle>Delete note?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete your
+              note and stop sharing it with your team.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              className="rounded-lg"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setShowDeleteDialog(false)
+                handleDelete()
+              }}
+              className="rounded-lg"
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
