@@ -1,21 +1,45 @@
-import { Button } from "@/components/ui/button"
+import {
+  Route,
+  createBrowserRouter,
+  createRoutesFromElements,
+  RouterProvider,
+  Outlet,
+} from "react-router"
+import { SignedIn, RedirectToSignIn } from "@neondatabase/neon-js/auth/react/ui"
+import Sidebar from "./components/layout/Sidebar"
+import Dashboard from "./pages/Dashboard"
+import NoteEditor from "./pages/NoteEditor"
+import SharedWithMe from "./pages/SharedWithMe"
+import Auth from "./pages/Auth"
 
-export function App() {
+function Layout() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
+    <SignedIn>
+      <div className="flex h-screen bg-background font-sans text-foreground">
+        <Sidebar />
+        <main className="flex-1 overflow-hidden">
+          <Outlet />
+        </main>
       </div>
-    </div>
+    </SignedIn>
   )
 }
 
-export default App
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/notes/:id" element={<NoteEditor />} />
+        <Route path="/shared" element={<SharedWithMe />} />
+      </Route>
+
+      <Route path="/auth/:path" element={<Auth />} />
+      <Route path="*" element={<RedirectToSignIn />} />
+    </>
+  )
+)
+
+export default function App() {
+  return <RouterProvider router={router} />
+}
