@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router"
 import { neon } from "@/neon"
-import type { Note } from "@/db/schema"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -14,8 +13,25 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { PlusIcon, SearchIcon } from "lucide-react"
+import type { Note } from "@/db/schema"
+import type { Database } from "@/types"
+
+function mapNote(row: Database["public"]["Tables"]["notes"]["Row"]): Note {
+  return {
+    id: row.id,
+    ownerId: row.owner_id,
+    content: row.content,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
 
 function NoteCard({ note, onClick }: { note: Note; onClick: () => void }) {
+
+  if (!note || !note.content || !note.createdAt) {
+    return null
+  }
+
   const preview = note.content.slice(0, 100)
   const title = note.content.split("\n")[0].slice(0, 50) || "Untitled"
 
@@ -37,7 +53,10 @@ function NoteCard({ note, onClick }: { note: Note; onClick: () => void }) {
       </CardHeader>
       <CardContent className="pt-0">
         <p className="text-xs text-muted-foreground">
-          {new Date(note.createdAt).toLocaleDateString()}
+          {new Date(note.createdAt).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+          })}
         </p>
       </CardContent>
     </Card>
@@ -57,10 +76,12 @@ export default function Dashboard() {
     const { data, error } = await neon
       .from("notes")
       .select("*")
+      .eq("owner_id", session?.user?.id || "")
       .order("created_at", { ascending: false })
 
     if (!error && data) {
-      setNotes(data as Note[])
+      const notes: Note[] = data.map(mapNote);
+      setNotes(notes);
     }
     setIsLoading(false)
   }, [])
@@ -80,12 +101,12 @@ export default function Dashboard() {
       .single()
 
     if (data) {
-      navigate(`/notes/${(data as Note).id}`)
+      navigate(`/notes/${(mapNote(data)).id}`)
     }
   }
 
   const filteredNotes = notes.filter((note) =>
-    note.content.toLowerCase().includes(searchQuery.toLowerCase())
+    note.content?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (

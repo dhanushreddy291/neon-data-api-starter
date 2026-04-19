@@ -1,6 +1,5 @@
-import { pgTable, pgSchema, index, foreignKey, uuid, text, timestamp, unique, boolean, uniqueIndex, jsonb } from "drizzle-orm/pg-core"
+import { pgTable, pgSchema, index, foreignKey, uuid, text, timestamp, unique, boolean, uniqueIndex, jsonb, pgPolicy, check } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
-import { authenticatedRole, crudPolicy, authUid } from "drizzle-orm/neon"
 
 export const neonAuth = pgSchema("neon_auth");
 
@@ -158,49 +157,49 @@ export const projectConfigInNeonAuth = neonAuth.table("project_config", {
 	unique("project_config_endpoint_id_key").on(table.endpointId),
 ]);
 
-export const notes = pgTable(
-	"notes",
-	{
-		id: uuid("id").defaultRandom().primaryKey(),
-		ownerId: text("owner_id")
-			.notNull()
-			.default(sql`(auth.user_id())`),
-		content: text("content").notNull(),
-		createdAt: timestamp("created_at").defaultNow().notNull(),
-	},
-	(table) => [
-		crudPolicy({
-			role: authenticatedRole,
-			read: authUid(table.ownerId),
-			modify: authUid(table.ownerId),
-		}),
-	]
-)
+export const notes = pgTable("notes", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	ownerId: uuid("owner_id").default(sql`auth.uid()`).notNull(),
+	content: text(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("idx_notes_owner").using("btree", table.ownerId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+		columns: [table.ownerId],
+		foreignColumns: [userInNeonAuth.id],
+		name: "notes_owner_id_fkey"
+	}).onDelete("cascade"),
+	pgPolicy("shared_users_read", {
+		as: "permissive", for: "select", to: ["public"], using: sql`(EXISTS ( SELECT 1
+   FROM note_shares ns
+  WHERE ((ns.note_id = notes.id) AND (ns.shared_with_user_id = auth.uid()))))` }),
+	pgPolicy("owners_full_access", { as: "permissive", for: "all", to: ["public"] }),
+]);
 
-export const noteShares = pgTable(
-	"note_shares",
-	{
-		id: uuid("id").defaultRandom().primaryKey(),
-		noteId: uuid("note_id")
-			.notNull()
-			.references(() => notes.id, { onDelete: "cascade" }),
-		sharedWithUserId: text("shared_with_user_id").notNull(),
-		permission: text("permission")
-			.$type<"read" | "edit">()
-			.default("read")
-			.notNull(),
-		createdAt: timestamp("created_at").defaultNow().notNull(),
-	},
-	(table) => [
-		crudPolicy({
-			role: authenticatedRole,
-			read: authUid(table.sharedWithUserId),
-			modify: sql`(EXISTS (SELECT 1 FROM notes WHERE notes.id = ${table.noteId} AND notes.owner_id = auth.uid()))`,
-		}),
-	]
-)
+export const noteShares = pgTable("note_shares", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	noteId: uuid("note_id").notNull(),
+	sharedWithUserId: uuid("shared_with_user_id").notNull(),
+	permission: text().default('read').notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("idx_shares_note").using("btree", table.noteId.asc().nullsLast().op("uuid_ops")),
+	index("idx_shares_user").using("btree", table.sharedWithUserId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+		columns: [table.noteId],
+		foreignColumns: [notes.id],
+		name: "note_shares_note_id_fkey"
+	}).onDelete("cascade"),
+	foreignKey({
+		columns: [table.sharedWithUserId],
+		foreignColumns: [userInNeonAuth.id],
+		name: "note_shares_shared_with_user_id_fkey"
+	}).onDelete("cascade"),
+	unique("note_shares_note_id_shared_with_user_id_key").on(table.noteId, table.sharedWithUserId),
+	pgPolicy("owner_manage_shares", { as: "permissive", for: "all", to: ["public"], using: sql`is_note_owner(note_id)`, withCheck: sql`is_note_owner(note_id)` }),
+	pgPolicy("shared_user_view", { as: "permissive", for: "select", to: ["public"] }),
+	check("note_shares_permission_check", sql`permission = 'read'::text`),
+]);
 
 export type Note = typeof notes.$inferSelect
-export type NewNote = typeof notes.$inferInsert
-export type NoteShare = typeof noteShares.$inferSelect
-export type NewNoteShare = typeof noteShares.$inferInsert
