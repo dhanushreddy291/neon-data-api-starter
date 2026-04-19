@@ -21,7 +21,7 @@ export default function Sidebar() {
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted"
           >
             <span>🤝</span>
-            Shared with Me
+            Team Notes
           </a>
         </div>
       </nav>

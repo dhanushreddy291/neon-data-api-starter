@@ -9,7 +9,7 @@ import { SignedIn, RedirectToSignIn } from "@neondatabase/neon-js/auth/react/ui"
 import Sidebar from "./components/layout/Sidebar"
 import Dashboard from "./pages/Dashboard"
 import NoteEditor from "./pages/NoteEditor"
-import SharedWithMe from "./pages/SharedWithMe"
+import TeamNotes from "./pages/TeamNotes"
 import Auth from "./pages/Auth"
 
 function Layout() {
@@ -31,7 +31,7 @@ const router = createBrowserRouter(
       <Route element={<Layout />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/notes/:id" element={<NoteEditor />} />
-        <Route path="/shared" element={<SharedWithMe />} />
+        <Route path="/shared" element={<TeamNotes />} />
       </Route>
 
       <Route path="/auth/:path" element={<Auth />} />

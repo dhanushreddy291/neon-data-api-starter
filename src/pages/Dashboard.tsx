@@ -21,13 +21,13 @@ function mapNote(row: Database["public"]["Tables"]["notes"]["Row"]): Note {
     id: row.id,
     ownerId: row.owner_id,
     content: row.content,
+    isShared: row.is_shared,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
-  };
+  }
 }
 
 function NoteCard({ note, onClick }: { note: Note; onClick: () => void }) {
-
   if (!note || !note.content || !note.createdAt) {
     return null
   }
@@ -80,8 +80,8 @@ export default function Dashboard() {
       .order("created_at", { ascending: false })
 
     if (!error && data) {
-      const notes: Note[] = data.map(mapNote);
-      setNotes(notes);
+      const notes: Note[] = data.map(mapNote)
+      setNotes(notes)
     }
     setIsLoading(false)
   }, [])
@@ -101,7 +101,9 @@ export default function Dashboard() {
       .single()
 
     if (data) {
-      navigate(`/notes/${(mapNote(data)).id}`)
+      navigate(
+        `/notes/${mapNote(data as Database["public"]["Tables"]["notes"]["Row"]).id}`
+      )
     }
   }
 

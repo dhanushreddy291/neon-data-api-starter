@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router"
 import { neon } from "@/neon"
-import type { Note } from "@/db/schema"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -13,20 +12,25 @@ import {
 } from "@/components/ui/card"
 import { SearchIcon } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import type { Note } from "@/db/schema"
+import type { Database } from "@/types"
 
-interface SharedNote extends Note {
-  sharedByUserId: string
+function mapNote(row: Database["public"]["Tables"]["notes"]["Row"]): Note {
+  return {
+    id: row.id,
+    ownerId: row.owner_id,
+    content: row.content,
+    isShared: row.is_shared,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
 }
 
-function SharedNoteCard({
-  note,
-  sharedBy,
-  onClick,
-}: {
-  note: SharedNote
-  sharedBy: string
-  onClick: () => void
-}) {
+function TeamNoteCard({ note, onClick }: { note: Note; onClick: () => void }) {
+  if (!note || !note.content || !note.createdAt) {
+    return null
+  }
+
   const preview = note.content.slice(0, 100)
   const title = note.content.split("\n")[0].slice(0, 50) || "Untitled"
 
@@ -40,68 +44,60 @@ function SharedNoteCard({
           <CardTitle className="line-clamp-1 text-base font-medium">
             {title}
           </CardTitle>
-          <Badge variant="outline">Shared</Badge>
+          <Badge variant="outline">Team</Badge>
         </div>
         <CardDescription className="line-clamp-2 text-xs">
           {preview}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
-        <p className="text-xs text-muted-foreground">Shared by {sharedBy}</p>
+        <p className="text-xs text-muted-foreground">
+          {new Date(note.createdAt).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+          })}
+        </p>
       </CardContent>
     </Card>
   )
 }
 
-export default function SharedWithMe() {
-  const [sharedNotes, setSharedNotes] = useState<SharedNote[]>([])
+export default function TeamNotes() {
+  const [teamNotes, setTeamNotes] = useState<Note[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
 
   const { data: session } = neon.auth.useSession()
 
-  const fetchSharedNotes = useCallback(async () => {
+  const fetchTeamNotes = useCallback(async () => {
     if (!session?.user) return
     setIsLoading(true)
-    const { data: shares } = await neon
-      .from("note_shares")
-      .select("note_id, shared_with_user_id")
-      .eq("shared_with_user_id", session!.user.id)
+    const { data } = await neon.from("notes").select("*").eq("is_shared", true)
 
-    if (shares && shares.length > 0) {
-      const noteIds = shares.map((s: { note_id: string }) => s.note_id)
-      const { data: notesData } = await neon
-        .from("notes")
-        .select("*")
-        .in("id", noteIds)
-
-      if (notesData) {
-        const notesWithSharedBy = notesData.map((note) => ({
-          ...note,
-          sharedByUserId: shares.find(
-            (s: { note_id: string }) => s.note_id === note.id
-          )?.shared_with_user_id,
-        })) as SharedNote[]
-        setSharedNotes(notesWithSharedBy)
-      }
+    if (data && data.length > 0) {
+      setTeamNotes(
+        data.map((row) =>
+          mapNote(row as Database["public"]["Tables"]["notes"]["Row"])
+        )
+      )
     }
     setIsLoading(false)
   }, [session])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchSharedNotes()
-  }, [fetchSharedNotes])
+    fetchTeamNotes()
+  }, [fetchTeamNotes])
 
-  const filteredNotes = sharedNotes.filter((note) =>
-    note.content.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredNotes = teamNotes.filter((note) =>
+    note.content?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
     <div className="flex h-full flex-col">
       <header className="flex h-14 items-center justify-between border-b border-border px-6">
-        <h2 className="text-lg font-semibold">Shared with Me</h2>
+        <h2 className="text-lg font-semibold">Team Notes</h2>
         <div className="relative">
           <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -121,18 +117,17 @@ export default function SharedWithMe() {
         ) : filteredNotes.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center text-center">
             <div className="mb-4 text-5xl">🤝</div>
-            <h3 className="mb-2 text-lg font-medium">No shared notes</h3>
+            <h3 className="mb-2 text-lg font-medium">No team notes</h3>
             <p className="text-sm text-muted-foreground">
-              Notes shared with you will appear here
+              Notes shared with the team will appear here
             </p>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredNotes.map((note) => (
-              <SharedNoteCard
+              <TeamNoteCard
                 key={note.id}
                 note={note}
-                sharedBy={note.sharedByUserId || "Unknown"}
                 onClick={() => navigate(`/notes/${note.id}`)}
               />
             ))}
