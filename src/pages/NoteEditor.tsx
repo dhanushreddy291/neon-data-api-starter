@@ -14,7 +14,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { ArrowLeftIcon, ShareIcon, TrashIcon, GlobeIcon } from "lucide-react"
+import {
+  ArrowLeftIcon,
+  ShareIcon,
+  TrashIcon,
+  GlobeIcon,
+  CalendarIcon,
+  ClockIcon,
+  FileTextIcon,
+} from "lucide-react"
 import { UserButton } from "@neondatabase/neon-js/auth/react"
 
 function mapNote(row: Database["public"]["Tables"]["notes"]["Row"]): Note {
@@ -86,7 +94,7 @@ export default function NoteEditor() {
   const handleDelete = async () => {
     if (!id) return
     await neon.from("notes").delete().eq("id", id)
-    navigate("/")
+    navigate("/notes")
   }
 
   const handleToggleShare = async () => {
@@ -116,16 +124,24 @@ export default function NoteEditor() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-14 items-center justify-between border-b border-border/50 bg-white/30 px-6 backdrop-blur-sm dark:bg-slate-900/30">
-        <div className="flex items-center gap-4">
+      <header className="flex h-14 items-center justify-between border-b border-border/50 bg-white/30 px-4 backdrop-blur-sm sm:px-6 dark:bg-slate-900/30">
+        <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             className="rounded-xl"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/notes")}
           >
             <ArrowLeftIcon className="h-4 w-4" />
           </Button>
+          <div className="hidden items-center gap-2 sm:flex">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-violet-100 to-purple-100 dark:from-violet-900/50 dark:to-purple-900/50">
+              <FileTextIcon className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+            </div>
+            <span className="max-w-[120px] truncate text-sm font-medium sm:max-w-[200px]">
+              {note.content?.split("\n")[0].slice(0, 30) || "Untitled"}
+            </span>
+          </div>
           <div className="flex items-center gap-2">
             {isSaving ? (
               <Badge variant="secondary" className="rounded-lg text-xs">
@@ -133,7 +149,10 @@ export default function NoteEditor() {
                 Saving...
               </Badge>
             ) : lastSaved ? (
-              <Badge variant="secondary" className="rounded-lg text-xs">
+              <Badge
+                variant="secondary"
+                className="hidden rounded-lg text-xs sm:inline-flex"
+              >
                 <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-500" />
                 Saved
               </Badge>
@@ -152,12 +171,14 @@ export default function NoteEditor() {
               {note.isShared ? (
                 <>
                   <GlobeIcon className="mr-1 h-4 w-4" />
-                  Stop Sharing
+                  <span className="hidden sm:inline">Stop Sharing</span>
+                  <span className="sm:hidden">Shared</span>
                 </>
               ) : (
                 <>
                   <ShareIcon className="mr-1 h-4 w-4" />
-                  Share with Team
+                  <span className="hidden sm:inline">Share with Team</span>
+                  <span className="sm:hidden">Share</span>
                 </>
               )}
             </Button>
@@ -186,13 +207,41 @@ export default function NoteEditor() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-6">
-        <Textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Start writing your note..."
-          className="min-h-full resize-none border-0 bg-transparent text-lg leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0"
-        />
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex items-center gap-4 border-b border-border/30 bg-white/20 px-6 py-3 backdrop-blur-sm dark:bg-slate-900/20">
+          {note.createdAt && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <CalendarIcon className="h-3.5 w-3.5" />
+              <span>
+                {new Date(note.createdAt).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+          )}
+          {note.updatedAt && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <ClockIcon className="h-3.5 w-3.5" />
+              <span>
+                {new Date(note.updatedAt).toLocaleTimeString("en-GB", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6">
+          <Textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Start writing your note..."
+            className="min-h-full resize-none border-0 bg-transparent text-base leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0 lg:text-lg"
+          />
+        </div>
       </div>
 
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
