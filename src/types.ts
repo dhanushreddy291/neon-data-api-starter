@@ -41,14 +41,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      dearmor: { Args: { "": string }; Returns: string }
-      gen_random_uuid: { Args: never; Returns: string }
-      gen_salt: { Args: { "": string }; Returns: string }
-      is_note_owner: { Args: { note_id: string }; Returns: boolean }
-      pgp_armor_headers: {
-        Args: { "": string }
-        Returns: Record<string, unknown>[]
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
