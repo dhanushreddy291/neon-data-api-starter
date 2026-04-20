@@ -11,11 +11,12 @@ import Dashboard from "./pages/Dashboard"
 import NoteEditor from "./pages/NoteEditor"
 import TeamNotes from "./pages/TeamNotes"
 import Auth from "./pages/Auth"
+import Account from "./pages/Account"
 
 function Layout() {
   return (
     <SignedIn>
-      <div className="flex h-screen bg-gradient-to-br from-slate-50 to-violet-50/30 font-sans text-foreground dark:from-slate-950 dark:to-violet-950/20">
+      <div className="flex h-screen bg-linear-to-br from-slate-50 to-violet-50/30 font-sans text-foreground dark:from-slate-950 dark:to-violet-950/20">
         <Sidebar />
         <main className="flex-1 overflow-hidden">
           <Outlet />
@@ -35,6 +36,7 @@ const router = createBrowserRouter(
       </Route>
 
       <Route path="/auth/:path" element={<Auth />} />
+      <Route path="/account/:path" element={<Account />} />
       <Route path="*" element={<RedirectToSignIn />} />
     </>
   )
