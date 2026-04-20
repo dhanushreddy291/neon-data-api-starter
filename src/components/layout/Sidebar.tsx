@@ -9,7 +9,7 @@ function SidebarContent() {
     <>
       <div className="flex h-14 items-center border-b border-border/50 px-4">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-linear-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/20">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20">
             <svg
               className="h-4 w-4 text-white"
               fill="none"
@@ -32,7 +32,7 @@ function SidebarContent() {
         <div className="flex flex-col gap-1">
           <Link
             to="/notes"
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-950/50 dark:hover:text-violet-300"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all hover:bg-primary/10 hover:text-primary"
           >
             <FileTextIcon className="h-4 w-4" />
             My Notes
@@ -54,7 +54,7 @@ function SidebarContent() {
         >
           <UserButton
             size="icon"
-            className="rounded-xl ring-2 ring-violet-500/20 hover:ring-violet-500/40"
+            className="rounded-xl ring-2 ring-primary/20 hover:ring-primary/40"
             classNames={{
               trigger: {
                 base: "!h-10 !w-10",

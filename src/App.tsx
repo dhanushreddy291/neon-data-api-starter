@@ -19,7 +19,7 @@ function NotesLayout() {
   return (
     <>
       <SignedIn>
-        <div className="flex h-screen bg-white dark:bg-slate-950">
+        <div className="flex h-screen bg-background">
           <Sidebar />
           <main className="flex-1 overflow-hidden">
             <Outlet />

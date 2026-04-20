@@ -135,8 +135,8 @@ export default function NoteEditor() {
             <ArrowLeftIcon className="h-4 w-4" />
           </Button>
           <div className="hidden items-center gap-2 sm:flex">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-violet-100 to-purple-100 dark:from-violet-900/50 dark:to-purple-900/50">
-              <FileTextIcon className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20">
+              <FileTextIcon className="h-4 w-4 text-primary" />
             </div>
             <span className="max-w-[120px] truncate text-sm font-medium sm:max-w-[200px]">
               {note.content?.split("\n")[0].slice(0, 30) || "Untitled"}
@@ -197,7 +197,7 @@ export default function NoteEditor() {
 
           <UserButton
             size="icon"
-            className="rounded-xl ring-2 ring-violet-500/20 hover:ring-violet-500/40"
+            className="rounded-xl ring-2 ring-primary/20 hover:ring-primary/40"
             classNames={{
               trigger: {
                 base: "!h-10 !w-10",
