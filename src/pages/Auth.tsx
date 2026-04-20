@@ -4,11 +4,11 @@ import { useParams } from "react-router"
 export default function AuthPage() {
   const { path } = useParams()
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-violet-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-violet-950">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-200/30 via-transparent to-transparent dark:from-violet-900/10" />
+    <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-violet-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-violet-950">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-violet-200/30 via-transparent to-transparent dark:from-violet-900/10" />
       <div className="relative flex min-h-screen items-center justify-center p-8">
         <div className="absolute top-16 left-1/2 -translate-x-1/2 text-center">
-          <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
+          <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
             <svg
               className="h-6 w-6 text-white"
               fill="none"

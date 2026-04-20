@@ -9,7 +9,7 @@ function SidebarContent() {
     <>
       <div className="flex h-14 items-center border-b border-border/50 px-4">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/20">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-linear-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/20">
             <svg
               className="h-4 w-4 text-white"
               fill="none"
@@ -87,7 +87,7 @@ export default function Sidebar() {
         <Sheet>
           <SheetTrigger
             asChild
-            className="fixed top-[10px] left-4 z-40 md:hidden"
+            className="fixed top-2.5 left-4 z-40 md:hidden"
           >
             <Button variant="outline" size="icon">
               <MenuIcon className="h-5 w-5" />

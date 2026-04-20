@@ -44,7 +44,7 @@ function NoteCard({ note, onClick }: { note: Note; onClick: () => void }) {
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-100 to-purple-100 text-violet-600 dark:from-violet-900/50 dark:to-purple-900/50 dark:text-violet-400">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-violet-100 to-purple-100 text-violet-600 dark:from-violet-900/50 dark:to-purple-900/50 dark:text-violet-400">
               <FileTextIcon className="h-4 w-4" />
             </div>
             <CardTitle className="line-clamp-1 text-base font-medium">
@@ -131,7 +131,7 @@ export default function Dashboard() {
     <div className="flex h-full flex-col">
       <header className="flex h-14 items-center justify-between gap-4 border-b border-border/50 bg-white/30 px-6 pl-14 backdrop-blur-sm md:pl-4 dark:bg-slate-900/30">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/20">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/20">
             <svg
               className="h-5 w-5 text-white"
               fill="none"
@@ -163,7 +163,7 @@ export default function Dashboard() {
           <Button
             onClick={handleCreateNote}
             size="sm"
-            className="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-700 hover:to-purple-700"
+            className="rounded-xl bg-linear-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-700 hover:to-purple-700"
           >
             <PlusIcon className="mr-1 h-4 w-4" />
             New Note
@@ -178,7 +178,7 @@ export default function Dashboard() {
           </div>
         ) : filteredNotes.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg dark:from-violet-900/50 dark:to-purple-900/50">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-violet-100 to-purple-100 shadow-lg dark:from-violet-900/50 dark:to-purple-900/50">
               <FileTextIcon className="h-8 w-8 text-violet-600 dark:text-violet-400" />
             </div>
             <h3 className="mb-2 text-lg font-semibold">No notes yet</h3>
@@ -187,7 +187,7 @@ export default function Dashboard() {
             </p>
             <Button
               onClick={handleCreateNote}
-              className="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-700 hover:to-purple-700"
+              className="rounded-xl bg-linear-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-700 hover:to-purple-700"
             >
               <PlusIcon className="mr-1 h-4 w-4" />
               Create your first note
