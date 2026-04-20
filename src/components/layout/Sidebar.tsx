@@ -85,10 +85,7 @@ export default function Sidebar() {
 
       {!isNoteEditor && (
         <Sheet>
-          <SheetTrigger
-            asChild
-            className="fixed top-2.5 left-4 z-40 md:hidden"
-          >
+          <SheetTrigger asChild className="fixed top-2.5 left-4 z-40 md:hidden">
             <Button variant="outline" size="icon">
               <MenuIcon className="h-5 w-5" />
             </Button>
