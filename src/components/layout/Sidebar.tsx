@@ -31,7 +31,7 @@ function SidebarContent() {
       <nav className="flex-1 overflow-y-auto p-3">
         <div className="flex flex-col gap-1">
           <Link
-            to="/"
+            to="/notes"
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-950/50 dark:hover:text-violet-300"
           >
             <FileTextIcon className="h-4 w-4" />
