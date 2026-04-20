@@ -100,7 +100,7 @@ export default function Dashboard() {
       setNotes(notes)
     }
     setIsLoading(false)
-  }, [])
+  }, [session])
 
   useEffect(() => {
     if (session?.user) {
