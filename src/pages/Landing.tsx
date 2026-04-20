@@ -101,7 +101,7 @@ export default function Landing() {
 
           <div className="flex items-center gap-2">
             <Button asChild size="sm" variant="ghost">
-              <Link to="/auth/sign-in">Sign in</Link>
+              <Link to="/notes">Sign in</Link>
             </Button>
             <Button asChild size="sm">
               <Link to="/notes">Open app</Link>
