@@ -74,22 +74,24 @@ export default function NoteEditor() {
     loadNoteData()
   }, [loadNoteData])
 
+  const isOwner = note ? session?.user?.id === note.ownerId : false
+
   const saveNote = useCallback(async () => {
-    if (!id || !content) return
+    if (!id || !content || !isOwner) return
     setIsSaving(true)
     await neon.from("notes").update({ content }).eq("id", id)
     setIsSaving(false)
     setLastSaved(new Date())
-  }, [id, content])
+  }, [id, content, isOwner])
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (content !== note?.content) {
+      if (isOwner && content !== note?.content) {
         saveNote()
       }
     }, 1000)
     return () => clearTimeout(timeoutId)
-  }, [content, note?.content, saveNote])
+  }, [content, note?.content, saveNote, isOwner])
 
   const handleDelete = async () => {
     if (!id) return
@@ -143,12 +145,12 @@ export default function NoteEditor() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            {isSaving ? (
+            {isOwner && isSaving ? (
               <Badge variant="secondary" className="rounded-lg text-xs">
                 <span className="mr-1 inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500" />
                 Saving...
               </Badge>
-            ) : lastSaved ? (
+            ) : isOwner && lastSaved ? (
               <Badge
                 variant="secondary"
                 className="hidden rounded-lg text-xs sm:inline-flex"
@@ -237,8 +239,13 @@ export default function NoteEditor() {
         <div className="flex-1 overflow-y-auto p-6">
           <Textarea
             value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Start writing your note..."
+            onChange={(e) => isOwner && setContent(e.target.value)}
+            placeholder={
+              isOwner
+                ? "Start writing your note..."
+                : "You don't have permission to edit this note."
+            }
+            readOnly={!isOwner}
             className="min-h-full resize-none border-0 bg-transparent text-base leading-relaxed placeholder:text-muted-foreground/50 focus-visible:ring-0 lg:text-lg"
           />
         </div>
