@@ -1,6 +1,6 @@
 import { UserButton } from "@neondatabase/neon-js/auth/react"
 import { FileTextIcon, UsersIcon, MenuIcon } from "lucide-react"
-import { Link } from "react-router"
+import { Link, useLocation } from "react-router"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 
@@ -74,27 +74,32 @@ function SidebarContent() {
 }
 
 export default function Sidebar() {
+  const location = useLocation()
+  const isNoteEditor = location.pathname.startsWith("/notes/")
+
   return (
     <>
       <aside className="hidden h-full w-64 flex-col border-r border-border/50 bg-white/30 backdrop-blur-sm md:flex dark:bg-slate-900/30">
         <SidebarContent />
       </aside>
 
-      <Sheet>
-        <SheetTrigger
-          asChild
-          className="fixed top-[10px] left-4 z-40 md:hidden"
-        >
-          <Button variant="outline" size="icon">
-            <MenuIcon className="h-5 w-5" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0">
-          <div className="flex h-full flex-col bg-white/30 backdrop-blur-sm dark:bg-slate-900/30">
-            <SidebarContent />
-          </div>
-        </SheetContent>
-      </Sheet>
+      {!isNoteEditor && (
+        <Sheet>
+          <SheetTrigger
+            asChild
+            className="fixed top-[10px] left-4 z-40 md:hidden"
+          >
+            <Button variant="outline" size="icon">
+              <MenuIcon className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-0">
+            <div className="flex h-full flex-col bg-white/30 backdrop-blur-sm dark:bg-slate-900/30">
+              <SidebarContent />
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
     </>
   )
 }
